@@ -222,8 +222,15 @@ static void gfx_sdl_onkeydown(int scancode) {
 
     if (state[SDL_SCANCODE_LALT] && state[SDL_SCANCODE_RETURN])
         configWindow.fullscreen = !configWindow.fullscreen;
-    else if (state[SDL_SCANCODE_ESCAPE] && configWindow.fullscreen)
-        configWindow.fullscreen = false;
+    else if (state[SDL_SCANCODE_ESCAPE]) {
+        switch (configEscKeyAction) {
+            case 0:
+                configWindow.fullscreen = !configWindow.fullscreen;
+                break;
+            case 1:
+                game_exit();
+        }
+    }
 }
 
 static void gfx_sdl_onkeyup(int scancode) {

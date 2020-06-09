@@ -75,6 +75,7 @@ unsigned int configKeyStickLeft[MAX_BINDS]  = { 0x001E,   VK_INVALID, VK_INVALID
 unsigned int configKeyStickRight[MAX_BINDS] = { 0x0020,   VK_INVALID, VK_INVALID };
 unsigned int configStickDeadzone = 16; // 16*DEADZONE_STEP=4960 (the original default deadzone)
 unsigned int configRumbleStrength = 50;
+unsigned int configEscKeyAction = 0;          // 0=Toggle Fullscreen, 1=Exit Game, 2=Manual Bind
 #ifdef EXTERNAL_DATA
 bool configPrecacheRes = true;
 #endif
@@ -118,6 +119,7 @@ static const struct ConfigOption options[] = {
     {.name = "key_stickright",       .type = CONFIG_TYPE_BIND, .uintValue = configKeyStickRight},
     {.name = "stick_deadzone",       .type = CONFIG_TYPE_UINT, .uintValue = &configStickDeadzone},
     {.name = "rumble_strength",      .type = CONFIG_TYPE_UINT, .uintValue = &configRumbleStrength},
+    {.name = "escape_key_action",    .type = CONFIG_TYPE_UINT, .uintValue = &configEscKeyAction},
     #ifdef EXTERNAL_DATA
     {.name = "precache",             .type = CONFIG_TYPE_BOOL, .boolValue = &configPrecacheRes},
     #endif

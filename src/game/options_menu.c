@@ -116,7 +116,14 @@ static const u8 bindStr[][32] = {
     { TEXT_BIND_LEFT },
     { TEXT_BIND_RIGHT },
     { TEXT_OPT_DEADZONE },
-    { TEXT_OPT_RUMBLE }
+    { TEXT_OPT_RUMBLE },
+    { TEXT_OPT_ESC_ACT },
+};
+
+static const u8 optsEscKeyStr[][32] = {
+    { TEXT_OPT_ESC_ACT1 },
+    { TEXT_OPT_ESC_ACT2 },
+    { TEXT_OPT_ESC_ACT3 },
 };
 
 static const u8 *filterChoices[] = {
@@ -128,6 +135,12 @@ static const u8 *vsyncChoices[] = {
     toggleStr[0],
     toggleStr[1],
     optsVideoStr[6],
+};
+
+static const u8 *escKeyChoices[] = {
+    optsEscKeyStr[0],
+    optsEscKeyStr[1],
+    optsEscKeyStr[2],
 };
 
 enum OptType {
@@ -238,7 +251,8 @@ static struct Option optsControls[] = {
     // max deadzone is 31000; this is less than the max range of ~32768, but this
     // way, the player can't accidentally lock themselves out of using the stick
     DEF_OPT_SCROLL( bindStr[16], &configStickDeadzone, 0, 100, 1 ),
-    DEF_OPT_SCROLL( bindStr[17], &configRumbleStrength, 0, 100, 1)
+    DEF_OPT_SCROLL( bindStr[17], &configRumbleStrength, 0, 100, 1 ),
+    DEF_OPT_CHOICE( bindStr[18], &configEscKeyAction, escKeyChoices),
 };
 
 static struct Option optsVideo[] = {

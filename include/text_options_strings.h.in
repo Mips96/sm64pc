@@ -68,6 +68,10 @@
 #define TEXT_BIND_RIGHT    _("STICK RIGHT")
 #define TEXT_OPT_DEADZONE  _("STICK DEADZONE")
 #define TEXT_OPT_RUMBLE    _("RUMBLE STRENGTH")
+#define TEXT_OPT_ESC_ACT   _("ESCAPE KEY ACTION")
+#define TEXT_OPT_ESC_ACT1  _("TOGGLE FULLSCREEN")
+#define TEXT_OPT_ESC_ACT2  _("EXIT GAME")
+#define TEXT_OPT_ESC_ACT3  _("MANUAL BIND")
 
 #define TEXT_OPT_CHEAT1    _("ENABLE CHEATS")
 #define TEXT_OPT_CHEAT2    _("MOONJUMP (PRESS L)")
@@ -126,6 +130,10 @@
 #define TEXT_BIND_RIGHT    _("Stick Right")
 #define TEXT_OPT_DEADZONE  _("Stick Deadzone")
 #define TEXT_OPT_RUMBLE    _("Rumble Strength")
+#define TEXT_OPT_ESC_ACT   _("Escape Key Action")
+#define TEXT_OPT_ESC_ACT1  _("Toggle Fullscreen")
+#define TEXT_OPT_ESC_ACT2  _("Exit Game")
+#define TEXT_OPT_ESC_ACT3  _("Manual Bind")
 
 #define TEXT_OPT_CHEAT1    _("Enable cheats")
 #define TEXT_OPT_CHEAT2    _("Moonjump (Press L)")
