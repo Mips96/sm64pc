@@ -5,9 +5,8 @@
 
 #define CONFIGFILE_DEFAULT "sm64config.txt"
 
-#define MAX_BINDS    3
-#define MAX_VOLUME   127
-#define VOLUME_SHIFT 7
+#define MAX_BINDS  3
+#define MAX_VOLUME 127
 
 typedef struct {
     unsigned int x, y, w, h;
@@ -53,8 +52,10 @@ extern bool         configCameraInvertX;
 extern bool         configCameraInvertY;
 extern bool         configEnableCamera;
 extern bool         configCameraMouse;
+extern bool         configCameraAnalog;
 #endif
 extern bool         configHUD;
+extern bool         configSkipIntro;
 #ifdef DISCORDRPC
 extern bool         configDiscordRPC;
 #endif

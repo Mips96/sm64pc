@@ -25,14 +25,13 @@
 #define VK_BASE_SDL_MOUSE (VK_BASE_SDL_GAMEPAD + VK_OFS_SDL_MOUSE)
 #define MAX_JOYBINDS 32
 #define MAX_MOUSEBUTTONS 8 // arbitrary
+#define MAX_JOYBUTTONS 32  // arbitrary; includes virtual keys for triggers
+#define AXIS_THRESHOLD (30 * 256)
 
-extern int16_t rightx;
-extern int16_t righty;
-
-#ifdef BETTERCAMERA
 int mouse_x;
 int mouse_y;
 
+#ifdef BETTERCAMERA
 extern u8 newcam_mouse;
 #endif
 
@@ -46,7 +45,7 @@ static u32 num_mouse_binds = 0;
 static u32 joy_binds[MAX_JOYBINDS][2];
 static u32 mouse_binds[MAX_JOYBINDS][2];
 
-static bool joy_buttons[SDL_CONTROLLER_BUTTON_MAX ] = { false };
+static bool joy_buttons[MAX_JOYBUTTONS] = { false };
 static u32 mouse_buttons = 0;
 static u32 last_mouse = VK_INVALID;
 static u32 last_joybutton = VK_INVALID;
@@ -141,6 +140,12 @@ static SDL_Haptic *controller_sdl_init_haptics(const int joy) {
     return hap;
 }
 
+static inline void update_button(const int i, const bool new) {
+    const bool pressed = !joy_buttons[i] && new;
+    joy_buttons[i] = new;
+    if (pressed) last_joybutton = i;
+}
+
 static void controller_sdl_read(OSContPad *pad) {
     if (!init_ok) {
         return;
@@ -187,12 +192,35 @@ static void controller_sdl_read(OSContPad *pad) {
         }
     }
 
+    int16_t leftx = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_LEFTX);
+    int16_t lefty = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_LEFTY);
+    int16_t rightx = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_RIGHTX);
+    int16_t righty = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_RIGHTY);
+
+    int16_t ltrig = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+    int16_t rtrig = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+
+#ifdef TARGET_WEB
+    // Firefox has a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1606562
+    // It sets down y to 32768.0f / 32767.0f, which is greater than the allowed 1.0f,
+    // which SDL then converts to a int16_t by multiplying by 32767.0f, which overflows into -32768.
+    // Maximum up will hence never become -32768 with the current version of SDL2,
+    // so this workaround should be safe in compliant browsers.
+    if (lefty == -32768) {
+        lefty = 32767;
+    }
+    if (righty == -32768) {
+        righty = 32767;
+    }
+#endif
+
     for (u32 i = 0; i < SDL_CONTROLLER_BUTTON_MAX; ++i) {
         const bool new = SDL_GameControllerGetButton(sdl_cntrl, i);
-        const bool pressed = !joy_buttons[i] && new;
-        joy_buttons[i] = new;
-        if (pressed) last_joybutton = i;
+        update_button(i, new);
     }
+
+    update_button(VK_LTRIGGER - VK_BASE_SDL_GAMEPAD, ltrig > AXIS_THRESHOLD);
+    update_button(VK_RTRIGGER - VK_BASE_SDL_GAMEPAD, rtrig > AXIS_THRESHOLD);
 
     u32 buttons_down = 0;
     for (u32 i = 0; i < num_joy_binds; ++i)
@@ -212,35 +240,10 @@ static void controller_sdl_read(OSContPad *pad) {
     else if (ystick == STICK_UP)
         pad->stick_y = 127;
 
-    int16_t leftx = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_LEFTX);
-    int16_t lefty = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_LEFTY);
-    rightx = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_RIGHTX);
-    righty = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_RIGHTY);
-
-    int16_t ltrig = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
-    int16_t rtrig = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
-
-#ifdef TARGET_WEB
-    // Firefox has a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1606562
-    // It sets down y to 32768.0f / 32767.0f, which is greater than the allowed 1.0f,
-    // which SDL then converts to a int16_t by multiplying by 32767.0f, which overflows into -32768.
-    // Maximum up will hence never become -32768 with the current version of SDL2,
-    // so this workaround should be safe in compliant browsers.
-    if (lefty == -32768) {
-        lefty = 32767;
-    }
-    if (righty == -32768) {
-        righty = 32767;
-    }
-#endif
-
     if (rightx < -0x4000) pad->button |= L_CBUTTONS;
     if (rightx > 0x4000) pad->button |= R_CBUTTONS;
     if (righty < -0x4000) pad->button |= U_CBUTTONS;
     if (righty > 0x4000) pad->button |= D_CBUTTONS;
-
-    if (ltrig > 30 * 256) pad->button |= Z_TRIG;
-    if (rtrig > 30 * 256) pad->button |= R_TRIG;
 
     uint32_t magnitude_sq = (uint32_t)(leftx * leftx) + (uint32_t)(lefty * lefty);
     uint32_t stickDeadzoneActual = configStickDeadzone * DEADZONE_STEP;
@@ -248,6 +251,14 @@ static void controller_sdl_read(OSContPad *pad) {
         pad->stick_x = leftx / 0x100;
         int stick_y = -lefty / 0x100;
         pad->stick_y = stick_y == 128 ? 127 : stick_y;
+    }
+
+    magnitude_sq = (uint32_t)(rightx * rightx) + (uint32_t)(righty * righty);
+    stickDeadzoneActual = configStickDeadzone * DEADZONE_STEP;
+    if (magnitude_sq > (uint32_t)(stickDeadzoneActual * stickDeadzoneActual)) {
+        pad->ext_stick_x = rightx / 0x100;
+        int stick_y = -righty / 0x100;
+        pad->ext_stick_y = stick_y == 128 ? 127 : stick_y;
     }
 }
 
