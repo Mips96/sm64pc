@@ -213,8 +213,6 @@ u32 pressed_pause(void) {
 
     if (!intangible && !val4 && !gWarpTransition.isActive && sDelayedWarpOp == WARP_OP_NONE
         && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
-        gTimeTrialResetIndex = 0;
-        time_trial_verify_times();
         return TRUE;
     }
 
@@ -1008,6 +1006,8 @@ s32 play_mode_normal(void) {
         } else if (sTransitionTimer != 0) {
             set_play_mode(PLAY_MODE_CHANGE_AREA);
         } else if (pressed_pause()) {
+            gTimeTrialResetIndex = 0;
+            time_trial_verify_times();
             lower_background_noise(1);
             cancel_rumble();
             gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN;
