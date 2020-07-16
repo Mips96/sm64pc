@@ -438,8 +438,8 @@ AS := i686-w64-mingw32-as
 endif
 
 ifneq ($(TARGET_WEB),1) # As in, not-web PC port
-  CC := $(CROSS)gcc
-  CXX := $(CROSS)g++
+  CC ?= $(CROSS)gcc
+  CXX ?= $(CROSS)g++
 else
   CC := emcc
   CXX := emcc
@@ -487,10 +487,7 @@ SDL2_USED := 0
 # for now, it's either SDL+GL or DXGI+DirectX, so choose based on WAPI
 ifeq ($(WINDOW_API),DXGI)
   DXBITS := `cat $(ENDIAN_BITWIDTH) | tr ' ' '\n' | tail -1`
-  ifeq ($(RENDER_API),D3D11)
-    BACKEND_LDFLAGS += -ld3d11
-  else ifeq ($(RENDER_API),D3D12)
-    BACKEND_LDFLAGS += -ld3d12
+  ifeq ($(RENDER_API),D3D12)
     BACKEND_CFLAGS += -Iinclude/dxsdk
   endif
   BACKEND_LDFLAGS += -ld3dcompiler -ldxgi -ldxguid
@@ -766,12 +763,10 @@ endif
 endif
 
 $(BUILD_DIR)/text/%/define_courses.inc.c: text/define_courses.inc.c text/%/courses.h
-	$(CPP) $(VERSION_CFLAGS) $< -o $@ -I text/$*/
-	$(TEXTCONV) charmap.txt $@ $@
+	$(CPP) $(VERSION_CFLAGS) $< -o - -I text/$*/ | $(TEXTCONV) charmap.txt - $@
 
 $(BUILD_DIR)/text/%/define_text.inc.c: text/define_text.inc.c text/%/courses.h text/%/dialogs.h
-	$(CPP) $(VERSION_CFLAGS) $< -o $@ -I text/$*/
-	$(TEXTCONV) charmap.txt $@ $@
+	$(CPP) $(VERSION_CFLAGS) $< -o - -I text/$*/ | $(TEXTCONV) charmap.txt - $@
 
 RSP_DIRS := $(BUILD_DIR)/rsp
 ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) $(ASM_DIRS) $(GODDARD_SRC_DIRS) $(ULTRA_SRC_DIRS) $(ULTRA_ASM_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) include) $(MIO0_DIR) $(addprefix $(MIO0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION) $(RSP_DIRS)
