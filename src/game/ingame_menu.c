@@ -908,18 +908,18 @@ void time_trial_int_to_str(u16 num, u8 *dst) {
     u16 timerMins = num / 1800;
     u16 timerSecs = (num - (timerMins * 1800)) / 30;
     u16 timerFracSecs = ((num - (timerMins * 1800) - (timerSecs * 30)) & 0xFFFF) * 100/30;
+    s32 secs1 = timerSecs / 10;
+    s32 secs2 = (timerSecs - secs1 * 10);
+    s32 fracSecs1 = timerFracSecs / 10;
+    s32 fracSecs2 = (timerFracSecs - fracSecs1 * 10);
 
     dst[0] = timerMins;
     dst[1] = 0x3E;
 
-    s32 secs1 = timerSecs / 10;
-    s32 secs2 = (timerSecs - secs1 * 10);
     dst[2] = secs1;
     dst[3] = secs2;
     dst[4] = 0x3E;
 
-    s32 fracSecs1 = timerFracSecs / 10;
-    s32 fracSecs2 = (timerFracSecs - fracSecs1 * 10);
     dst[5] = fracSecs1;
     dst[6] = fracSecs2;
     dst[7] = DIALOG_CHAR_TERMINATOR;
@@ -933,13 +933,13 @@ void time_trial_int_to_str_course(u32 num, u8 *dst) {
 
     s8 pos = 0;
 
-    s32 mins1;
-    s32 mins2;
-    s32 mins3;
-
-    mins1 = timerMins / 100;
-    mins2 = (timerMins - mins1 * 100) / 10;
-    mins3 = (timerMins - mins1 * 100) - (mins2 * 10);
+    s32 mins1 = timerMins / 100;
+    s32 mins2 = (timerMins - mins1 * 100) / 10;
+    s32 mins3 = (timerMins - mins1 * 100) - (mins2 * 10);
+    s32 secs1 = timerSecs / 10;
+    s32 secs2 = (timerSecs - secs1 * 10);
+    s32 fracSecs1 = timerFracSecs / 10;
+    s32 fracSecs2 = (timerFracSecs - fracSecs1 * 10);
     if (mins1 != 0) {
         dst[pos++] = mins1;
     } else {
@@ -952,15 +952,9 @@ void time_trial_int_to_str_course(u32 num, u8 *dst) {
     }
     dst[pos++] = mins3;
     dst[pos++] = 0x3E;
-
-    s32 secs1 = timerSecs / 10;
-    s32 secs2 = (timerSecs - secs1 * 10);
     dst[pos++] = secs1;
     dst[pos++] = secs2;
     dst[pos++] = 0x3E;
-
-    s32 fracSecs1 = timerFracSecs / 10;
-    s32 fracSecs2 = (timerFracSecs - fracSecs1 * 10);
     dst[pos++] = fracSecs1;
     dst[pos++] = fracSecs2;
     dst[pos] = DIALOG_CHAR_TERMINATOR;
@@ -974,15 +968,14 @@ void time_trial_int_to_str_total(u32 num, u8 *dst) {
 
     s8 pos = 0;
 
-    s32 mins1;
-    s32 mins2;
-    s32 mins3;
-    s32 mins4;
-
-    mins1 = timerMins / 1000;
-    mins2 = (timerMins - mins1 * 1000) / 100;
-    mins3 = ((timerMins - mins1 * 1000) - (mins2 * 100)) / 10;
-    mins4 = (timerMins - mins1 * 1000) - (mins2 * 100) - (mins3 * 10);
+    s32 mins1 = timerMins / 1000;
+    s32 mins2 = (timerMins - mins1 * 1000) / 100;
+    s32 mins3 = ((timerMins - mins1 * 1000) - (mins2 * 100)) / 10;
+    s32 mins4 = (timerMins - mins1 * 1000) - (mins2 * 100) - (mins3 * 10);
+    s32 secs1 = timerSecs / 10;
+    s32 secs2 = (timerSecs - secs1 * 10);
+    s32 fracSecs1 = timerFracSecs / 10;
+    s32 fracSecs2 = (timerFracSecs - fracSecs1 * 10);
     if (mins1 != 0) {
         dst[pos++] = mins1;
     } else {
@@ -1000,15 +993,9 @@ void time_trial_int_to_str_total(u32 num, u8 *dst) {
     }
     dst[pos++] = mins4;
     dst[pos++] = 0x3E;
-
-    s32 secs1 = timerSecs / 10;
-    s32 secs2 = (timerSecs - secs1 * 10);
     dst[pos++] = secs1;
     dst[pos++] = secs2;
     dst[pos++] = 0x3E;
-
-    s32 fracSecs1 = timerFracSecs / 10;
-    s32 fracSecs2 = (timerFracSecs - fracSecs1 * 10);
     dst[pos++] = fracSecs1;
     dst[pos++] = fracSecs2;
     dst[pos] = DIALOG_CHAR_TERMINATOR;
@@ -2873,46 +2860,46 @@ void time_trial_render_pause_castle_times(void) {
     u8 textTotal[] = { TEXT_TIME_TRIAL_TOTAL };
     u8 timeStrVal[8];
     u8 totalTimeStrVal[16];
+    u16 time1 = time_trial_save_file_get_time(gDialogLineNum, 0);
+    u16 time2 = time_trial_save_file_get_time(gDialogLineNum, 1);
+    u16 time3 = time_trial_save_file_get_time(gDialogLineNum, 2);
+    u16 time4 = time_trial_save_file_get_time(gDialogLineNum, 3);
+    u16 time5 = time_trial_save_file_get_time(gDialogLineNum, 4);
+    u16 time6 = time_trial_save_file_get_time(gDialogLineNum, 5);
+    u16 timeCoin = time_trial_save_file_get_time(gDialogLineNum, 6);
 
     print_generic_string(40, 144, textStarWord);
     print_generic_string(70, 144, textNum1);
-    u16 time1 = time_trial_save_file_get_time(gDialogLineNum, 0);
     time_trial_int_to_str(time1, timeStrVal);
     print_generic_string(100, 144, timeStrVal);
 
     print_generic_string(40, 120, textStarWord);
     print_generic_string(70, 120, textNum2);
-    u16 time2 = time_trial_save_file_get_time(gDialogLineNum, 1);
     time_trial_int_to_str(time2, timeStrVal);
     print_generic_string(100, 120, timeStrVal);
 
     print_generic_string(40, 96, textStarWord);
     print_generic_string(70, 96, textNum3);
-    u16 time3 = time_trial_save_file_get_time(gDialogLineNum, 2);
     time_trial_int_to_str(time3, timeStrVal);
     print_generic_string(100, 96, timeStrVal);
 
     print_generic_string(184, 144, textStarWord);
     print_generic_string(214, 144, textNum4);
-    u16 time4 = time_trial_save_file_get_time(gDialogLineNum, 3);
     time_trial_int_to_str(time4, timeStrVal);
     print_generic_string(244, 144, timeStrVal);
 
     print_generic_string(184, 120, textStarWord);
     print_generic_string(214, 120, textNum5);
-    u16 time5 = time_trial_save_file_get_time(gDialogLineNum, 4);
     time_trial_int_to_str(time5, timeStrVal);
     print_generic_string(244, 120, timeStrVal);
 
     print_generic_string(184, 96, textStarWord);
     print_generic_string(214, 96, textNum6);
-    u16 time6 = time_trial_save_file_get_time(gDialogLineNum, 5);
     time_trial_int_to_str(time6, timeStrVal);
     print_generic_string(244, 96, timeStrVal);
 
     print_generic_string(112, 72, textStarWord);
     print_generic_string(142, 72, textCoin);
-    u16 timeCoin = time_trial_save_file_get_time(gDialogLineNum, 6);
     time_trial_int_to_str(timeCoin, timeStrVal);
     print_generic_string(202, 72, timeStrVal);
 
@@ -2941,39 +2928,39 @@ void time_trial_render_pause_secret_times(void) {
     u8 textTotal[] = { TEXT_TIME_TRIAL_TOTAL };
     u8 timeStrVal[8];
     u8 totalTimeStrVal[16];
+    u16 time1 = time_trial_save_file_get_time(18, 0);
+    u16 time2 = time_trial_save_file_get_time(18, 1);
+    u16 time3 = time_trial_save_file_get_time(23, 0);
+    u16 time4 = time_trial_save_file_get_time(20, 0);
+    u16 time5 = time_trial_save_file_get_time(21, 0);
+    u16 time6 = time_trial_save_file_get_time(19, 0);
+    u16 time7 = time_trial_save_file_get_time(22, 0);
 
     print_generic_string(40, 144, textPSS1);
-    u16 time1 = time_trial_save_file_get_time(18, 0);
     time_trial_int_to_str(time1, timeStrVal);
     print_generic_string(100, 144, timeStrVal);
 
     print_generic_string(40, 120, textPSS2);
-    u16 time2 = time_trial_save_file_get_time(18, 1);
     time_trial_int_to_str(time2, timeStrVal);
     print_generic_string(100, 120, timeStrVal);
 
     print_generic_string(40, 96, textSA);
-    u16 time3 = time_trial_save_file_get_time(23, 0);
     time_trial_int_to_str(time3, timeStrVal);
     print_generic_string(100, 96, timeStrVal);
 
     print_generic_string(184, 144, textTotWC);
-    u16 time4 = time_trial_save_file_get_time(20, 0);
     time_trial_int_to_str(time4, timeStrVal);
     print_generic_string(244, 144, timeStrVal);
 
     print_generic_string(184, 120, textVCUtM);
-    u16 time5 = time_trial_save_file_get_time(21, 0);
     time_trial_int_to_str(time5, timeStrVal);
     print_generic_string(244, 120, timeStrVal);
 
     print_generic_string(184, 96, textCotMC);
-    u16 time6 = time_trial_save_file_get_time(19, 0);
     time_trial_int_to_str(time6, timeStrVal);
     print_generic_string(244, 96, timeStrVal);
 
     print_generic_string(112, 72, textWMOtR);
-    u16 time7 = time_trial_save_file_get_time(22, 0);
     time_trial_int_to_str(time7, timeStrVal);
     print_generic_string(202, 72, timeStrVal);
 
@@ -2998,39 +2985,39 @@ void time_trial_render_pause_bowser_times(void) {
     u8 textTotal[] = { TEXT_TIME_TRIAL_TOTAL };
     u8 timeStrVal[8];
     u8 totalTimeStrVal[16];
+    u16 time1 = time_trial_save_file_get_time(15, 0);
+    u16 time2 = time_trial_save_file_get_time(16, 0);
+    u16 time3 = time_trial_save_file_get_time(17, 0);
+    u16 time4 = time_trial_save_file_get_time(15, 1);
+    u16 time5 = time_trial_save_file_get_time(16, 1);
+    u16 time6 = time_trial_save_file_get_time(17, 1);
 
     print_generic_string(40, 144, textStarWord);
     print_generic_string(70, 144, textNum1);
-    u16 time1 = time_trial_save_file_get_time(15, 0);
     time_trial_int_to_str(time1, timeStrVal);
     print_generic_string(100, 144, timeStrVal);
 
     print_generic_string(40, 120, textStarWord);
     print_generic_string(70, 120, textNum2);
-    u16 time2 = time_trial_save_file_get_time(16, 0);
     time_trial_int_to_str(time2, timeStrVal);
     print_generic_string(100, 120, timeStrVal);
 
     print_generic_string(40, 96, textStarWord);
     print_generic_string(70, 96, textNum3);
-    u16 time3 = time_trial_save_file_get_time(17, 0);
     time_trial_int_to_str(time3, timeStrVal);
     print_generic_string(100, 96, timeStrVal);
 
     print_generic_string(184, 144, textKeyWord);
     print_generic_string(208, 144, textNum1);
-    u16 time4 = time_trial_save_file_get_time(15, 1);
     time_trial_int_to_str(time4, timeStrVal);
     print_generic_string(244, 144, timeStrVal);
 
     print_generic_string(184, 120, textKeyWord);
     print_generic_string(208, 120, textNum2);
-    u16 time5 = time_trial_save_file_get_time(16, 1);
     time_trial_int_to_str(time5, timeStrVal);
     print_generic_string(244, 120, timeStrVal);
 
     print_generic_string(184, 96, textFinal);
-    u16 time6 = time_trial_save_file_get_time(17, 1);
     time_trial_int_to_str(time6, timeStrVal);
     print_generic_string(244, 96, timeStrVal);
 
@@ -3055,6 +3042,7 @@ void time_trial_render_pause_castle_main_strings(void) {
 
     u8 strVal[8];
     s16 starNum = gDialogLineNum;
+    u8 bowserStr[8] = { TEXT_TIME_TRIAL_BOWSER };
 
 #ifdef VERSION_EU
     switch (gInGameLanguage) {
@@ -3098,8 +3086,6 @@ void time_trial_render_pause_castle_main_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    u8 bowserStr[8] = { TEXT_TIME_TRIAL_BOWSER };
-
     switch (gDialogLineNum) {
         case COURSE_STAGES_COUNT:
             courseName = segmented_to_virtual(courseNameTbl[COURSE_MAX]);
@@ -3137,10 +3123,11 @@ void time_trial_render_pause_castle_main_strings(void) {
 }
 
 void time_trial_render_pause_timer_toggle(void) {
+    u8 timerToggleText[32] = { TEXT_TIME_TRIAL_TIMER_TOGGLE };
+
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    u8 timerToggleText[32] = { TEXT_TIME_TRIAL_TIMER_TOGGLE };
     print_generic_string(88, 20, timerToggleText);
 
     if (gPlayer3Controller->buttonPressed & (U_CBUTTONS | D_CBUTTONS)) {
@@ -3152,10 +3139,11 @@ void time_trial_render_pause_timer_toggle(void) {
 }
 
 void time_trial_check_input_for_course_times_reset(void) {
+    u8 resetCodeStr[] = { TEXT_TIME_TRIAL_RESET };
+
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    u8 resetCodeStr[] = { TEXT_TIME_TRIAL_RESET };
     print_generic_string(64, 8, resetCodeStr);
 
     if (gPlayer3Controller->buttonPressed & timeTrialResetIndexCombo[gTimeTrialResetIndex]) {

@@ -244,6 +244,8 @@ static void save_main_menu_data(void) {
 }
 
 static void wipe_main_menu_data(void) {
+    u8 i;
+
     bzero(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]));
 
     // Set score ages for all courses to 3, 2, 1, and 0, respectively.
@@ -252,7 +254,7 @@ static void wipe_main_menu_data(void) {
     gSaveBuffer.menuData[0].coinScoreAges[2] = 0x15555555;
 
     // Set all time trial times to the max amount
-    for (u8 i = 0; i < 118; i++)
+    for (i = 0; i < 118; i++)
         gSaveBuffer.menuData[0].timeTrialTimes[i] = 17999;
     gSaveBuffer.menuData[0].timeTrialTotalTime = 17999 * 118;
 
@@ -814,8 +816,9 @@ void time_trial_save_file_set_time(s32 courseIndex, s16 starIndex, u16 time, u8 
 }
 
 void time_trial_update_total_time(u8 forceSave) {
+    u8 i;
     gSaveBuffer.menuData[0].timeTrialTotalTime = 0;
-    for (u8 i = 0; i < 118; i++) {
+    for (i = 0; i < 118; i++) {
         gSaveBuffer.menuData[0].timeTrialTotalTime += gSaveBuffer.menuData[0].timeTrialTimes[i];
     }
     gMainMenuDataModified = TRUE;
@@ -867,9 +870,11 @@ u32 time_trial_save_file_get_total_time(void) {
 
 // If any times are equal to 0 (which is how they're initialized) or above the max allowed value, reset all times
 void time_trial_verify_times(void) {
-    for (u8 i = 0; i < 118; i++) {
+    u8 i;
+    for (i = 0; i < 118; i++) {
         if (gSaveBuffer.menuData[0].timeTrialTimes[i] == 0 || gSaveBuffer.menuData[0].timeTrialTimes[i] > 17999) {
-            for (u8 j = 0; j < 118; j++) {
+            u8 j;
+            for (j = 0; j < 118; j++) {
                 gSaveBuffer.menuData[0].timeTrialTimes[j] = 17999;
                 time_trial_update_total_time(0);
             }
