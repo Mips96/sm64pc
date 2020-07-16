@@ -171,7 +171,9 @@ s32 sDelayedWarpArg;
 s16 unusedEULevelUpdateBss1;
 #endif
 s8 sTimerRunning;
+s8 sTimeTrialTimerRunning;
 s8 gShouldNotPlayCastleMusic;
+s16 sLastLevelNum;
 
 struct MarioState *gMarioState = &gMarioStates[0];
 u8 unused1[4] = { 0 };
@@ -211,6 +213,8 @@ u32 pressed_pause(void) {
 
     if (!intangible && !val4 && !gWarpTransition.isActive && sDelayedWarpOp == WARP_OP_NONE
         && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
+        gTimeTrialResetIndex = 0;
+        time_trial_verify_times();
         return TRUE;
     }
 
@@ -890,8 +894,10 @@ void update_hud_values(void) {
 
         if (gCurrCourseNum > 0) {
             gHudDisplay.flags |= HUD_DISPLAY_FLAG_COIN_COUNT;
+            gHudDisplay.flags |= HUD_DISPLAY_FLAG_TIME_TRIAL_TIMER;
         } else {
             gHudDisplay.flags &= ~HUD_DISPLAY_FLAG_COIN_COUNT;
+            gHudDisplay.flags &= ~HUD_DISPLAY_FLAG_TIME_TRIAL_TIMER;
         }
 
         if (gHudDisplay.coins < gMarioState->numCoins) {
@@ -978,6 +984,10 @@ s32 play_mode_normal(void) {
 
     if (sTimerRunning && gHudDisplay.timer < 17999) {
         gHudDisplay.timer += 1;
+    }
+
+    if (sTimeTrialTimerRunning && gHudDisplay.timeTrialTimer < 17999) {
+        gHudDisplay.timeTrialTimer += 1;
     }
 
     area_update_objects();
@@ -1224,6 +1234,12 @@ s32 init_level(void) {
     if (gMarioState->action == ACT_INTRO_CUTSCENE) {
         sound_banks_disable(2, 0x0330);
     }
+
+    // gCurrAreaIndex is > 1 for certain areas you can spawn directly into, like LLL's volcano or SSL's pyramid
+    if ((sLastLevelNum == LEVEL_CASTLE || sLastLevelNum == LEVEL_CASTLE_GROUNDS || sLastLevelNum == LEVEL_CASTLE_COURTYARD) && (gCurrAreaIndex == 1 || gCurrLevelNum == LEVEL_THI))
+        gHudDisplay.timeTrialTimer = 0;
+    sTimeTrialTimerRunning = !(gCurrLevelNum == LEVEL_CASTLE || gCurrLevelNum == LEVEL_CASTLE_GROUNDS || gCurrLevelNum == LEVEL_CASTLE_COURTYARD);
+    sLastLevelNum = gCurrLevelNum;
 
     return 1;
 }

@@ -24,6 +24,8 @@
 #include "sound_init.h"
 #include "thread6.h"
 
+#include "hud.h"
+
 #define INT_GROUND_POUND_OR_TWIRL (1 << 0) // 0x01
 #define INT_PUNCH                 (1 << 1) // 0x02
 #define INT_KICK                  (1 << 2) // 0x04
@@ -802,6 +804,11 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
 
         starIndex = (o->oBehParams >> 24) & 0x1F;
         save_file_collect_star_or_key(m->numCoins, starIndex);
+        if ((!noExit) && (gCurrLevelNum == LEVEL_BOWSER_1 || gCurrLevelNum == LEVEL_BOWSER_2 || gCurrLevelNum == LEVEL_BOWSER_3)) {
+            time_trial_save_file_set_time(gCurrCourseNum - 1, 1, gHudDisplay.timeTrialTimer, 0);
+        } else {
+            time_trial_save_file_set_time(gCurrCourseNum - 1, starIndex, gHudDisplay.timeTrialTimer, 0);
+        }
 
         m->numStars =
             save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
@@ -809,6 +816,7 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         if (!noExit) {
             drop_queued_background_music();
             fadeout_level_music(126);
+            sTimeTrialTimerRunning = 0;
         }
 
         play_sound(SOUND_MENU_STAR_SOUND, m->marioObj->header.gfx.cameraToObject);
