@@ -3131,6 +3131,7 @@ void time_trial_render_pause_timer_toggle(void) {
     print_generic_string(88, 20, timerToggleText);
 
     if (gPlayer3Controller->buttonPressed & (U_CBUTTONS | D_CBUTTONS)) {
+        sTimeTrialTimerDisabled = !sTimeTrialTimerDisabled;
         gHudDisplay.flags ^= HUD_DISPLAY_FLAG_TIME_TRIAL_TIMER;
         play_sound(SOUND_MENU_CHANGE_SELECT, gDefaultSoundArgs);
     }

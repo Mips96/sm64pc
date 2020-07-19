@@ -90,6 +90,7 @@ extern u8 unused4[2];
 extern s8 sTimerRunning;
 
 extern s8 sTimeTrialTimerRunning;
+extern u8 sTimeTrialTimerDisabled;
 extern u8 gTimeTrialResetIndex;
 
 struct HudDisplay {

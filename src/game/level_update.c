@@ -172,6 +172,7 @@ s16 unusedEULevelUpdateBss1;
 #endif
 s8 sTimerRunning;
 s8 sTimeTrialTimerRunning;
+u8 sTimeTrialTimerDisabled;
 s8 gShouldNotPlayCastleMusic;
 s16 sLastLevelNum;
 
@@ -892,10 +893,13 @@ void update_hud_values(void) {
 
         if (gCurrCourseNum > 0) {
             gHudDisplay.flags |= HUD_DISPLAY_FLAG_COIN_COUNT;
-            gHudDisplay.flags |= HUD_DISPLAY_FLAG_TIME_TRIAL_TIMER;
+            if (sTimeTrialTimerDisabled) {
+                gHudDisplay.flags &= ~HUD_DISPLAY_FLAG_TIME_TRIAL_TIMER;
+            } else {
+                gHudDisplay.flags |= HUD_DISPLAY_FLAG_TIME_TRIAL_TIMER;
+            }
         } else {
             gHudDisplay.flags &= ~HUD_DISPLAY_FLAG_COIN_COUNT;
-            gHudDisplay.flags &= ~HUD_DISPLAY_FLAG_TIME_TRIAL_TIMER;
         }
 
         if (gHudDisplay.coins < gMarioState->numCoins) {
@@ -1239,6 +1243,9 @@ s32 init_level(void) {
     if ((sLastLevelNum == LEVEL_CASTLE || sLastLevelNum == LEVEL_CASTLE_GROUNDS || sLastLevelNum == LEVEL_CASTLE_COURTYARD) && (gCurrAreaIndex == 1 || gCurrLevelNum == LEVEL_THI))
         gHudDisplay.timeTrialTimer = 0;
     sTimeTrialTimerRunning = !(gCurrLevelNum == LEVEL_CASTLE || gCurrLevelNum == LEVEL_CASTLE_GROUNDS || gCurrLevelNum == LEVEL_CASTLE_COURTYARD);
+    if (!sTimeTrialTimerRunning) {
+        gHudDisplay.flags &= ~HUD_DISPLAY_FLAG_TIME_TRIAL_TIMER;
+    }
     sLastLevelNum = gCurrLevelNum;
 
     return 1;
