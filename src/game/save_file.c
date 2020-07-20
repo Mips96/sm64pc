@@ -773,6 +773,7 @@ s32 check_warp_checkpoint(struct WarpNode *warpNode) {
 void time_trial_save_file_set_time(s32 courseIndex, s16 starIndex, u16 time, u8 forceSet) {
     u8 timeIndex;
     u8 forceSave = 0;
+    time_trial_verify_times();
     switch (courseIndex) {
         case 15:
             timeIndex = 112 + (3*starIndex);
