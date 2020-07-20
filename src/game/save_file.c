@@ -770,6 +770,21 @@ s32 check_warp_checkpoint(struct WarpNode *warpNode) {
     return isWarpCheckpointActive;
 }
 
+// If any times are equal to 0 (which is how they're initialized) or above the max allowed value, reset all times
+void time_trial_verify_times(void) {
+    u8 i;
+    for (i = 0; i < 118; i++) {
+        if (gSaveBuffer.menuData[0].timeTrialTimes[i] == 0 || gSaveBuffer.menuData[0].timeTrialTimes[i] > 17999) {
+            u8 j;
+            for (j = 0; j < 118; j++) {
+                gSaveBuffer.menuData[0].timeTrialTimes[j] = 17999;
+                time_trial_update_total_time(0);
+            }
+            break;
+        }
+    }
+}
+
 void time_trial_save_file_set_time(s32 courseIndex, s16 starIndex, u16 time, u8 forceSet) {
     u8 timeIndex;
     u8 forceSave = 0;
@@ -867,19 +882,4 @@ u16 time_trial_save_file_get_time(s32 courseIndex, s16 starIndex) {
 
 u32 time_trial_save_file_get_total_time(void) {
     return gSaveBuffer.menuData[0].timeTrialTotalTime;
-}
-
-// If any times are equal to 0 (which is how they're initialized) or above the max allowed value, reset all times
-void time_trial_verify_times(void) {
-    u8 i;
-    for (i = 0; i < 118; i++) {
-        if (gSaveBuffer.menuData[0].timeTrialTimes[i] == 0 || gSaveBuffer.menuData[0].timeTrialTimes[i] > 17999) {
-            u8 j;
-            for (j = 0; j < 118; j++) {
-                gSaveBuffer.menuData[0].timeTrialTimes[j] = 17999;
-                time_trial_update_total_time(0);
-            }
-            break;
-        }
-    }
 }
