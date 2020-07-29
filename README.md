@@ -1,4 +1,9 @@
 # sm64ex
+
+My personal development fork for sm64pc. My code changes and patch files can be found in Pull Requests. The readme for the original repo is below:
+
+
+
 Fork of [sm64-port/sm64-port](https://github.com/sm64-port/sm64-port) with additional features. 
 
 Feel free to report bugs and contribute, but remember, there must be **no upload of any copyrighted asset**. 
