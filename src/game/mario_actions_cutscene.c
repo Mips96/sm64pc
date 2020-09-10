@@ -2515,13 +2515,13 @@ static s32 act_end_peach_cutscene(struct MarioState *m) {
 }
 
 #ifdef VERSION_EU
-    #define TIMER_CREDITS_SHOW      51
-    #define TIMER_CREDITS_PROGRESS  80
-    #define TIMER_CREDITS_WARP     160
+    #define TIMER_CREDITS_SHOW      64
+    #define TIMER_CREDITS_PROGRESS  93
+    #define TIMER_CREDITS_WARP     173
 #else
-    #define TIMER_CREDITS_SHOW      61
-    #define TIMER_CREDITS_PROGRESS  90
-    #define TIMER_CREDITS_WARP     200
+    #define TIMER_CREDITS_SHOW      74
+    #define TIMER_CREDITS_PROGRESS 103
+    #define TIMER_CREDITS_WARP     213
 #endif
 
 static s32 act_credits_cutscene(struct MarioState *m) {
